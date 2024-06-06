@@ -7,12 +7,12 @@ namespace OpenAI_UIR.Models
     {
         [Key]
         public int Id { get; set; }
-        public ICollection<Question> Questions { get; set; }
+        public ICollection<Question> Questions { get; set; } = new List<Question>();
         public DateTime CreatedAt { get; set; }
     }
 
-   
 
-   
+
+
 
 }

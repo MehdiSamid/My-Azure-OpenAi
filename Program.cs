@@ -59,6 +59,13 @@ builder.Services.AddSingleton<OpenAIClient>(sp =>
     return new OpenAIClient(endpoint, new AzureKeyCredential(apiKey));
 });
 
+// Configure JSON serialization options
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+    });
+
 //builder.Services.AddSingleton<OpenAIService>(new OpenAIService(Environment.GetEnvironmentVariable("AZURE_OPENAI_API_KEY")));
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

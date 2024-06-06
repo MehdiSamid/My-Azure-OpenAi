@@ -15,21 +15,21 @@ namespace OpenAI_UIR.Data
         public DbSet<Question> Question { get; set; }
         public DbSet<Response> Response { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Question>()
-                .HasOne(u => u.Response)
-                .WithOne(up => up.Question)
-                .HasForeignKey<Response>(up => up.Id_Question);
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //    modelBuilder.Entity<Question>()
+        //        .HasOne(u => u.Response)
+        //        .WithOne(up => up.Question)
+        //        .HasForeignKey<Response>(up => up.Id_Question);
 
-            modelBuilder.Entity<Question>()
-                .HasOne(o => o.Conversation)
-                .WithMany(c => c.Questions)
-                .HasForeignKey(o => o.Id_Conversation);
+        //    modelBuilder.Entity<Question>()
+        //        .HasOne(o => o.Conversation)
+        //        .WithMany(c => c.Questions)
+        //        .HasForeignKey(o => o.Id_Conversation);
 
 
-            base.OnModelCreating(modelBuilder);
-        }
+        //    base.OnModelCreating(modelBuilder);
+        //}
 
     }
 }

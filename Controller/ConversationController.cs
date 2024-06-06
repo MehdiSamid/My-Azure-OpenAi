@@ -14,81 +14,50 @@ namespace OpenAI_UIR.Controller
             _context = context;
         }
 
+        // GET: api/Conversation/{id}
+        [HttpGet("Conversation/{id}")]
+        public async Task<ActionResult<Conversation>> GetConversationById(int id)
+        {
+            var conversation = await _context.Conversation
+                .Include(c => c.Questions)
+                    .ThenInclude(q => q.Responses)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (conversation == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(conversation);
+        }
+
+        // GET: api/Conversation
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Conversation>>> GetConversations()
+        public async Task<ActionResult<IEnumerable<Conversation>>> GetAllConversations()
         {
-            return await _context.Conversation.ToListAsync();
+            var conversations = await _context.Conversation
+                .Include(c => c.Questions)
+                    .ThenInclude(q => q.Responses)
+                .ToListAsync();
+
+            return Ok(conversations);
         }
 
-        [HttpGet("conversation/{id}")]
-        public async Task<ActionResult<Conversation>> GetConversation(int id)
+        // GET: api/Conversation/{id}/QuestionsAndResponses
+        [HttpGet("Conversation/{id}/QuestionsAndResponses")]
+        public async Task<ActionResult<IEnumerable<Question>>> GetQuestionsAndResponsesByConversationId(int id)
         {
-            var conversation = await _context.Conversation.FindAsync(id);
+            var questions = await _context.Question
+                .Where(q => q.ConversationId == id)
+                .Include(q => q.Responses)
+                .ToListAsync();
 
-            if (conversation == null)
+            if (questions == null || !questions.Any())
             {
                 return NotFound();
             }
 
-            return conversation;
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<Conversation>> PostConversation(Conversation conversation)
-        {
-            _context.Conversation.Add(conversation);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetConversation), new { id = conversation.Id }, conversation);
-        }
-
-        [HttpPut("conversation/{id}")]
-        public async Task<IActionResult> PutConversation(int id, Conversation conversation)
-        {
-            if (id != conversation.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(conversation).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ConversationExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        [HttpDelete("conversation/{id}")]
-        public async Task<IActionResult> DeleteConversation(int id)
-        {
-            var conversation = await _context.Conversation.FindAsync(id);
-            if (conversation == null)
-            {
-                return NotFound();
-            }
-
-            _context.Conversation.Remove(conversation);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool ConversationExists(int id)
-        {
-            return _context.Conversation.Any(e => e.Id == id);
+            return Ok(questions);
         }
     }
 }

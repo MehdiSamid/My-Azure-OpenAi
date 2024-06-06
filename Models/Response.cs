@@ -7,10 +7,13 @@ namespace OpenAI_UIR.Models
     {
         [Key]
         public int Id { get; set; }
-        public string Message { get; set; }
+        public string Message { get; set; } = string.Empty;
+
         [ForeignKey("Question")]
-        public int Id_Question { get; set; }
-        public Question Question { get; set; }
+        public int QuestionId { get; set; }
+        public Question Question { get; set; } = null!; // Using null-forgiving operator
+
         public DateTime CreatedAt { get; set; }
     }
+    
 }
