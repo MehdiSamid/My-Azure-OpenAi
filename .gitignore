@@ -1,0 +1,27 @@
+# Ignore the .vs directory (Visual Studio files)
+.vs/
+
+# Ignore build directories
+bin/
+obj/
+
+# Ignore NuGet packages
+packages/
+
+# Ignore other temporary files
+*.tmp
+*.log
+*.user
+*.suo
+*.pdb
+*.cache
+*.config
+
+# Ignore compiled DLLs
+*.dll
+
+# Ignore compiled executables
+*.exe
+
+# Ignore any file with extension .pyc (Python compiled files, if any)
+*.pyc
