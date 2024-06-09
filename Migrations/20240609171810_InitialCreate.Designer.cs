@@ -12,7 +12,7 @@ using OpenAI_UIR.Data;
 namespace OpenAIUIR.Migrations
 {
     [DbContext(typeof(ConversationContextDb))]
-    [Migration("20240606124209_InitialCreate")]
+    [Migration("20240609171810_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -36,9 +36,17 @@ namespace OpenAIUIR.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("GuidId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Conversation");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Conversations");
                 });
 
             modelBuilder.Entity("OpenAI_UIR.Models.Question", b =>
@@ -49,21 +57,21 @@ namespace OpenAIUIR.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("ConversationId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Id_Conversation")
-                        .HasColumnType("int");
-
-                    b.Property<string>("questionContent")
+                    b.Property<string>("QuestionContent")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Id_Conversation");
+                    b.HasIndex("ConversationId");
 
-                    b.ToTable("Question");
+                    b.ToTable("Questions");
                 });
 
             modelBuilder.Entity("OpenAI_UIR.Models.Response", b =>
@@ -77,26 +85,57 @@ namespace OpenAIUIR.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Id_Question")
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("QuestionId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Message")
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("Responses");
+                });
+
+            modelBuilder.Entity("OpenAI_UIR.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Id_Question")
-                        .IsUnique();
+                    b.ToTable("Users");
+                });
 
-                    b.ToTable("Response");
+            modelBuilder.Entity("OpenAI_UIR.Models.Conversation", b =>
+                {
+                    b.HasOne("OpenAI_UIR.Models.User", "User")
+                        .WithMany("Conversations")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("OpenAI_UIR.Models.Question", b =>
                 {
                     b.HasOne("OpenAI_UIR.Models.Conversation", "Conversation")
                         .WithMany("Questions")
-                        .HasForeignKey("Id_Conversation")
+                        .HasForeignKey("ConversationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -106,8 +145,8 @@ namespace OpenAIUIR.Migrations
             modelBuilder.Entity("OpenAI_UIR.Models.Response", b =>
                 {
                     b.HasOne("OpenAI_UIR.Models.Question", "Question")
-                        .WithOne("Response")
-                        .HasForeignKey("OpenAI_UIR.Models.Response", "Id_Question")
+                        .WithMany("Responses")
+                        .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -121,8 +160,12 @@ namespace OpenAIUIR.Migrations
 
             modelBuilder.Entity("OpenAI_UIR.Models.Question", b =>
                 {
-                    b.Navigation("Response")
-                        .IsRequired();
+                    b.Navigation("Responses");
+                });
+
+            modelBuilder.Entity("OpenAI_UIR.Models.User", b =>
+                {
+                    b.Navigation("Conversations");
                 });
 #pragma warning restore 612, 618
         }

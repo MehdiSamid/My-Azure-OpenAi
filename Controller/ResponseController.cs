@@ -20,14 +20,14 @@ namespace OpenAI_UIR.Controller
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Response>>> GetResponses()
         {
-            return await _context.Response.ToListAsync();
+            return await _context.Responses.ToListAsync();
         }
 
         // GET: api/Response/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Response>> GetResponse(int id)
         {
-            var response = await _context.Response.FindAsync(id);
+            var response = await _context.Responses.FindAsync(id);
 
             if (response == null)
             {
@@ -41,7 +41,7 @@ namespace OpenAI_UIR.Controller
         [HttpPost]
         public async Task<ActionResult<Response>> PostResponse(Response response)
         {
-            _context.Response.Add(response);
+            _context.Responses.Add(response);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetResponse", new { id = response.Id }, response);
@@ -81,13 +81,13 @@ namespace OpenAI_UIR.Controller
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteResponse(int id)
         {
-            var response = await _context.Response.FindAsync(id);
+            var response = await _context.Responses.FindAsync(id);
             if (response == null)
             {
                 return NotFound();
             }
 
-            _context.Response.Remove(response);
+            _context.Responses.Remove(response);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -95,7 +95,7 @@ namespace OpenAI_UIR.Controller
 
         private bool ResponseExists(int id)
         {
-            return _context.Response.Any(e => e.Id == id);
+            return _context.Responses.Any(e => e.Id == id);
         }
     }
 }

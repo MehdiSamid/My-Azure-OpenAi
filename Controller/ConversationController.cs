@@ -18,7 +18,7 @@ namespace OpenAI_UIR.Controller
         [HttpGet("Conversation/{id}")]
         public async Task<ActionResult<Conversation>> GetConversationById(int id)
         {
-            var conversation = await _context.Conversation
+            var conversation = await _context.Conversations
                 .Include(c => c.Questions)
                     .ThenInclude(q => q.Responses)
                 .FirstOrDefaultAsync(c => c.Id == id);
@@ -31,11 +31,28 @@ namespace OpenAI_UIR.Controller
             return Ok(conversation);
         }
 
+        // GET: api/Conversation/{id}
+        [HttpGet("Conversation/IdUser/{id}")]
+        public async Task<ActionResult<Conversation>> GetConversationByIdUser(int id)
+        {
+            var conversation = await _context.Conversations
+                .Include(c => c.Questions)
+                    .ThenInclude(q => q.Responses)
+                .Where(c => c.UserId == id).ToListAsync();
+
+            if (conversation == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(conversation);
+        }
+
         // GET: api/Conversation
-        [HttpGet]
+        [HttpGet("Conversation/GetAll")]
         public async Task<ActionResult<IEnumerable<Conversation>>> GetAllConversations()
         {
-            var conversations = await _context.Conversation
+            var conversations = await _context.Conversations
                 .Include(c => c.Questions)
                     .ThenInclude(q => q.Responses)
                 .ToListAsync();
@@ -47,7 +64,7 @@ namespace OpenAI_UIR.Controller
         [HttpGet("Conversation/{id}/QuestionsAndResponses")]
         public async Task<ActionResult<IEnumerable<Question>>> GetQuestionsAndResponsesByConversationId(int id)
         {
-            var questions = await _context.Question
+            var questions = await _context.Questions
                 .Where(q => q.ConversationId == id)
                 .Include(q => q.Responses)
                 .ToListAsync();
