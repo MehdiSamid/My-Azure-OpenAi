@@ -18,7 +18,8 @@ namespace OpenAI_UIR.Controller
             // Validate and respond
             if (request.UserName == "admin" && request.Password == "admin_password")
             {
-                return Ok(new { token = "dummy_token" });
+                var User = _context.Users.FirstOrDefault();
+                return Ok(User);
             }
             return Unauthorized();
         }
